@@ -6,7 +6,7 @@ public class Powerup : MonoBehaviour
 {
     [SerializeField]
     private float _speed = 3f;
-    [SerializeField]
+    [SerializeField] // 0 = Triple Shot; 1 = Speed; 2 = Shield
     private int powerupID;
 
     // Update is called once per frame

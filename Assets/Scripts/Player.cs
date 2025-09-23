@@ -6,6 +6,7 @@ public class Player : MonoBehaviour
 {
     [SerializeField]
     private float _speed = 5f;
+    private float _speedMultiplier = 2;
     [SerializeField]
     private GameObject _tripleShotPrefab;
     [SerializeField]
@@ -19,7 +20,14 @@ public class Player : MonoBehaviour
     [SerializeField]
     private bool _isTripleShotEnabled = false;
     [SerializeField]
+    private bool _isSpeedEnabled = false;
+    [SerializeField]
     private bool _isShieldEnabled = false;
+    [SerializeField]
+    private GameObject _shieldVisualizer;
+    [SerializeField]
+    private int _score;
+    private UIManager _uiManager;
 
     // Start is called before the first frame update
     void Start()
@@ -28,10 +36,16 @@ public class Player : MonoBehaviour
         transform.position = new Vector3(0, 0, 0);
 
         _spawnManager = GameObject.Find("Spawn_Manager").GetComponent<SpawnManager>();
+        _uiManager = GameObject.Find("Canvas").GetComponent<UIManager>();
 
         if (_spawnManager == null)
         {
             Debug.LogError("The Spawn_Manager is NULL.");
+        }
+
+        if (_uiManager == null)
+        {
+            Debug.LogError("The UI Manager is NULL.");
         }
     }
 
@@ -50,9 +64,9 @@ public class Player : MonoBehaviour
     {
         float horizontalInput = Input.GetAxis("Horizontal");
         float verticalInput = Input.GetAxis("Vertical");
-        Vector3 direction = new Vector3(horizontalInput, verticalInput, 0) * _speed * Time.deltaTime;
+        Vector3 direction = new Vector3(horizontalInput, verticalInput, 0);
 
-        transform.Translate(direction);
+        transform.Translate(direction * _speed * Time.deltaTime);
 
         float maxAllowedHeight = 0;
         float minAllowedHeight = -3.8f;
@@ -91,7 +105,16 @@ public class Player : MonoBehaviour
 
     public void Damage()
     {
+        if (_isShieldEnabled == true)
+        {
+            _isShieldEnabled = false;
+            _shieldVisualizer.SetActive(false);
+            return;
+        }
+
         _lives--;
+
+        _uiManager.UpdateLives(_lives);
 
         if (_lives < 1)
         {
@@ -114,25 +137,35 @@ public class Player : MonoBehaviour
 
     public void EnableSpeed()
     {
-        _speed *= 2;
+        _isSpeedEnabled = true;
+        _speed *= _speedMultiplier;
         StartCoroutine(SpeedPowerDownRoutine());
     }
 
     IEnumerator SpeedPowerDownRoutine()
     {
         yield return new WaitForSeconds(5f);
-        _speed /= 2;
+        _speed /= _speedMultiplier;
+        _isSpeedEnabled = false;
     }
 
     public void EnableShield()
     {
         _isShieldEnabled = true;
+        _shieldVisualizer.SetActive(true);
         StartCoroutine(ShieldPowerDownRoutine());
     }
 
     IEnumerator ShieldPowerDownRoutine()
     {
         yield return new WaitForSeconds(5f);
+        _shieldVisualizer.SetActive(false);
         _isShieldEnabled = false;
+    }
+
+    public void AddScore(int score)
+    {
+        _score += score;
+        _uiManager.UpdateScore(_score);
     }
 }
