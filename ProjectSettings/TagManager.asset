@@ -18,7 +18,7 @@ TagManager:
   - UI
   - 
   - 
-  - 
+  - Post Processing
   - 
   - 
   - 
@@ -51,4 +51,7 @@ TagManager:
     locked: 0
   - name: Foreground
     uniqueID: 2922384979
+    locked: 0
+  - name: Foreground_Plus
+    uniqueID: 480282207
     locked: 0
